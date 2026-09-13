@@ -1,23 +1,49 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
-import Hero from './components/Hero'
-import WorldSection from './components/WorldSection'
-import FeatureSection from './components/FeatureSection'
-import HowItWorks from './components/HowItWorks'
-import FinalCTA from './components/FinalCTA'
 import Footer from './components/Footer'
+import LandingPage from './pages/LandingPage'
+import CreatePage from './pages/CreatePage'
+import QuizzesPage from './pages/QuizzesPage'
 
-export default function App() {
+function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="grain relative min-h-screen bg-void">
       <Navbar />
-      <main>
-        <Hero />
-        <WorldSection />
-        <FeatureSection />
-        <HowItWorks />
-        <FinalCTA />
-      </main>
+      <main>{children}</main>
       <Footer />
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <AppLayout>
+              <LandingPage />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/create"
+          element={
+            <AppLayout>
+              <CreatePage />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/quizzes"
+          element={
+            <AppLayout>
+              <QuizzesPage />
+            </AppLayout>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   )
 }

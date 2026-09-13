@@ -1,13 +1,25 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { Link, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import BrainByteLogo from './BrainByteLogo'
 
-const LINKS = ['Home', 'Explore', 'Quizzes', 'Categories', 'About']
+const NAV_LINKS = [
+  { label: 'Home', to: '/' },
+  { label: 'Create', to: '/create' },
+  { label: 'Quizzes', to: '/quizzes' },
+]
+
+const HASH_LINKS = [
+  { label: 'Explore', hash: '#explore' },
+  { label: 'About', hash: '#about' },
+]
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const location = useLocation()
+  const isHome = location.pathname === '/'
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -15,6 +27,12 @@ export default function Navbar() {
     onScroll()
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [location.pathname])
+
+  const hashHref = (hash: string) => (isHome ? hash : `/${hash}`)
 
   return (
     <motion.header
@@ -34,29 +52,41 @@ export default function Navbar() {
           scrolled ? 'liquid-glass' : 'bg-transparent border border-transparent'
         }`}
       >
-        <a href="#hero" aria-label="BrainByte home">
+        <Link to="/" aria-label="BrainByte home">
           <BrainByteLogo size={32} />
-        </a>
+        </Link>
 
         <ul className="hidden md:flex items-center gap-8 text-sm text-silver">
-          {LINKS.map((link) => (
-            <li key={link}>
+          {NAV_LINKS.map((link) => (
+            <li key={link.to}>
+              <Link
+                to={link.to}
+                className={`transition-colors duration-300 hover:text-cream ${
+                  location.pathname === link.to ? 'text-cream' : ''
+                }`}
+              >
+                {link.label}
+              </Link>
+            </li>
+          ))}
+          {HASH_LINKS.map((link) => (
+            <li key={link.hash}>
               <a
-                href={`#${link.toLowerCase()}`}
+                href={hashHref(link.hash)}
                 className="hover:text-cream transition-colors duration-300"
               >
-                {link}
+                {link.label}
               </a>
             </li>
           ))}
         </ul>
 
-        <a
-          href="#quiz-arena"
+        <Link
+          to="/create"
           className="hidden md:inline-flex items-center rounded-full bg-ivory text-void text-sm font-medium px-5 py-2.5 hover:bg-cream transition-colors duration-300"
         >
-          Start a quiz
-        </a>
+          Upload notes
+        </Link>
 
         <button
           onClick={() => setMenuOpen((v) => !v)}
@@ -78,21 +108,23 @@ export default function Navbar() {
             className="liquid-glass-strong absolute top-20 left-4 right-4 rounded-3xl p-6 md:hidden"
           >
             <ul className="flex flex-col gap-5 text-lg text-ivory">
-              {LINKS.map((link) => (
-                <li key={link}>
-                  <a href={`#${link.toLowerCase()}`} onClick={() => setMenuOpen(false)}>
-                    {link}
-                  </a>
+              {NAV_LINKS.map((link) => (
+                <li key={link.to}>
+                  <Link to={link.to}>{link.label}</Link>
+                </li>
+              ))}
+              {HASH_LINKS.map((link) => (
+                <li key={link.hash}>
+                  <a href={hashHref(link.hash)}>{link.label}</a>
                 </li>
               ))}
             </ul>
-            <a
-              href="#quiz-arena"
-              onClick={() => setMenuOpen(false)}
+            <Link
+              to="/create"
               className="mt-6 inline-flex w-full justify-center rounded-full bg-ivory text-void text-sm font-medium px-5 py-3"
             >
-              Start a quiz
-            </a>
+              Upload notes
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
